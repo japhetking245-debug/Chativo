@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="sw">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHATIVO.ONLINE - Connect • Chat • Belong</title>
+
+    <meta name="description" content="CHATIVO.ONLINE - Connect, Chat, Belong.">
+    <link rel="canonical" href="https://chativo.netlify.app/">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background: #e2e8f0;
+            color: #1e293b;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-screen {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background: #eef2f6;
+            position: relative;
+            overflow-y: auto;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .1);
+        }
+
+        /* ================= NOTIFICATION ================= */
+
+        .notification-banner {
+            position: fixed;
+            top: -300px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 24px);
+            max-width: 406px;
+            background: rgba(255, 255, 255, .98);
+            backdrop-filter: blur(16px);
+            border-radius: 20px;
+            padding: 14px 16px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, .15);
+            z-index: 99999;
+            transition: top .4s cubic-bezier(.175, .885, .32, 1.275);
+            border: 1px solid rgba(0, 0, 0, .08);
+            color: #0f172a;
+        }
+
+        .notification-banner.active {
+            top: 12px;
+        }
+
+        .notif-header-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .notif-avatar-wrapper {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
+        .notif-avatar-bg {
+            width: 44px;
+            height: 44px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 20px;
+        }
+
+        .notif-badge-msg {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 22px;
+            height: 22px;
+            background: #0b57d0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notif-badge-msg svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .notif-main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notif-title-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+
+        .notif-provider-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: #0f172a;
+        }
+
+        .notif-timestamp {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .notif-body-preview {
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .notif-toggle-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 2px 4px;
+        }
+
+        .notif-expanded-content {
+            display: none;
+            margin-top: 14px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(0, 0, 0, .08);
+        }
+
+        .notif-copy-box {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+
+        .notif-action-btn {
+            width: 100%;
+            background: #e2e8f0;
+            border: none;
+            padding: 10px;
+            border-radius: 20px;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ================= HEADER ================= */
+
+        .gochatz-header {
+            padding: 14px 16px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-circle {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #e05244, #d93829);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        /* ================= NAV ================= */
+
+        .top-nav-buttons {
+            display: flex;
+            gap: 6px;
+            padding: 6px 14px;
+            overflow-x: auto;
+        }
+
+        .top-nav-buttons button,
+        .top-nav-buttons a {
+            border: none;
+            padding: 8px 12px;
+            border-radius: 18px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-nav-action {
+            background: #e05244;
+            color: #fff;
+        }
+
+        .btn-nav-secondary {
+            background: #cbd5e1;
+            color: #334155;
+        }
+
+        .btn-nav-green {
+            background: #10b981;
+            color: #fff;
+        }
+
+        /* ================= PILLS ================= */
+
+        .pill-card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 8px 14px;
+            margin: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #334155;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ================= BALANCE ================= */
+
+        .fin-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 0 14px;
+            margin-top: 6px;
+        }
+
+        .fin-card {
+            border-radius: 16px;
+            padding: 12px 10px;
+            min-height: 105px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .fin-card.balance {
+            background: #2d6a4f;
+            color: #ffffff;
+        }
+
+        .fin-card.withdraw {
+            background: #e2d4c0;
+            color: #2d261e;
+        }
+
+        .fin-card-title {
+            font-size: 10px;
+            font-weight: 800;
+            opacity: 0.9;
+        }
+
+        .fin-card-value {
+            font-size: 15px;
+            font-weight: 900;
+            margin: 5px 0 10px;
+        }
+
+        .btn-toa-pesa {
+            background: #ffffff;
+            color: #2d6a4f;
+            border: none;
+            padding: 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* ================= PROMO ================= */
+
+        .promo-banner {
+            background: #e6bc53;
+            border-radius: 20px;
+            padding: 18px 14px;
+            margin: 12px 14px;
+            text-align: center;
+            color: #3a2e05;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .promo-banner h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .btn-jisajili {
+            background: #ffffff;
+            color: #3a2e05;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* ================= GUESTS ================= */
+
+        .section-header-row {
+            display: flex;
+            padding: 8px 14px 4px;
+        }
+
+        .section-heading {
+            font-size: 15px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .guest-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0 14px;
+        }
+
+        .guest-card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 18px;
+            padding: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .guest-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .guest-avatar-wrapper {
+            position: relative;
+        }
+
+        .guest-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .guest-flag-badge {
+            position: absolute;
+            bottom: 0;
+            right: -2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .guest-info-name {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .guest-status {
+            font-size: 11px;
+            color: #10b981;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .guest-country {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .tags-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .tag-pill {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .guest-price-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .pill-time {
+            background: #10b981;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 10px;
+        }
+
+        .pill-price {
+            background: #e6bc53;
+            color: #3a2e05;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 10px;
+        }
+
+        .card-site-footer {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .action-buttons-grid {
+            display: flex;
+            width: 100%;
+        }
+
+        .btn-action-chat,
+        .btn-action-completed {
+            width: 100%;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .btn-action-chat {
+            background: #10b981;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .btn-action-completed {
+            background: #94a3b8;
+            color: #ffffff;
+        }
+
+        /* ================= TRANSACTIONS ================= */
+
+        .card-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 18px;
+            padding: 14px;
+            margin: 12px 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .card-section-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .tx-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .tx-name {
+            font-size: 11px;
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        .tx-time {
+            font-size: 9px;
+            color: #64748b;
+        }
+
+        .tx-green {
+            color: #10b981;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .tx-red {
+            color: #ef4444;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* ================= CHAT ================= */
+
+        #chat-screen {
+            position: absolute;
+            inset: 0;
+            background: #fff;
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+        }
+
+        .chat-header {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #0f172a;
+        }
+
+        .chat-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #fff;
+        }
+
+        .msg-mzungu {
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 12px 16px;
+            border-radius: 18px 18px 18px 4px;
+            font-size: 14px;
+            max-width: 85%;
+            align-self: flex-start;
+            line-height: 1.45;
+            border: 1px solid #e2e8f0;
+        }
+
+        .msg-me {
+            background: #10b981;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 18px 18px 4px 18px;
+            font-size: 14px;
+            max-width: 85%;
+            align-self: flex-end;
+            line-height: 1.45;
+        }
+
+        .typing-indicator {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 8px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #64748b;
+            max-width: 80%;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .typing-dots {
+            display: inline-flex;
+            gap: 3px;
+        }
+
+        .typing-dots span {
+            width: 5px;
+            height: 5px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: typingBlink 1.4s infinite both;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: .2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: .4s;
+        }
+
+        @keyframes typingBlink {
+
+            0%,
+            100% {
+                opacity: .2
+            }
+
+            20% {
+                opacity: 1
+            }
+        }
+
+        .chat-input-area {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 10px 16px;
+            color: #0f172a;
+            outline: none;
+        }
+
+        .btn-send-green {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        /* ================= MODALS ================= */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            width: 100%;
+            max-width: 390px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            color: #1e293b;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: #64748b;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 12px;
+            color: #0f172a;
+            font-size: 13px;
+            outline: none;
+        }
+
+        /* RECEIPT STYLES */
+        .receipt-box {
+            border: 2px dashed #cbd5e1;
+            padding: 15px;
+            border-radius: 12px;
+            background: #f8fafc;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .footer-reset-container {
+            text-align: center;
+            padding: 20px 14px;
+        }
+
+        .btn-hidden-reset {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 10px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* ADDITIONAL UTILITY AND COMPONENT STYLES */
+        .promo-desc {
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .btn-chat-back {
+            background: none;
+            border: none;
+            color: #0f172a;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        #chat-user-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        #chat-status-text {
+            font-size: 11px;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .chat-stats-right {
+            text-align: right;
+        }
+
+        #timer {
+            font-size: 12px;
+            color: #d97706;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        #money {
+            font-size: 11px;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .modal-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .modal-title-green {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2d6a4f;
+        }
+
+        .btn-modal-close {
+            background: none;
+            border: none;
+            color: #0f172a;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-withdraw-submit {
+            margin-top: 8px;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .receipt-icon-success {
+            font-size: 40px;
+            color: #10b981;
+        }
+
+        .receipt-title {
+            font-size: 16px;
+            margin-top: 6px;
+            color: #0f172a;
+        }
+
+        .receipt-subtitle {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        #rec-amount {
+            color: #10b981;
+        }
+
+        .receipt-status-confirmed {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .receipt-close-btn {
+            margin-top: 16px;
+        }
+
+        .modal-content-center {
+            text-align: center;
+        }
+
+        .congrats-trophy-icon {
+            font-size: 45px;
+            color: #e6bc53;
+        }
+
+        .congrats-title {
+            font-size: 18px;
+            color: #0f172a;
+            margin-top: 10px;
+        }
+
+        #congrats-text {
+            font-size: 13px;
+            color: #334155;
+            margin-top: 8px;
+        }
+
+        .congrats-reward-box {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 15px 0;
+        }
+
+        .congrats-reward-label {
+            font-size: 11px;
+            color: #065f46;
+        }
+
+        #congrats-amount {
+            font-size: 18px;
+            color: #10b981;
+        }
+
+        .exit-modal-desc {
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .modal-btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-exit-cancel {
+            background: #cbd5e1;
+            color: #1e293b;
+        }
+
+        .btn-exit-confirm {
+            background: #ef4444;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-screen" id="main-container">
+
+        <!-- NOTIFICATION -->
+        <div class="notification-banner" id="notif-banner">
+
+            <div class="notif-header-row">
+
+                <div class="notif-avatar-wrapper">
+                    <div class="notif-avatar-bg">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div class="notif-badge-msg">
+                        <svg viewBox="0 0 24 24" fill="#ffffff">
+                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="notif-main-content">
+                    <div class="notif-title-line">
+                        <span class="notif-provider-name" id="notif-provider-title">
+                            HaloPesa
+                        </span>
+
+                        <span class="notif-timestamp" id="notif-time">
+                            5:44 AM
+                        </span>
+                    </div>
+
+                    <div class="notif-body-preview" id="notif-body-text">
+                        Hakuna ujumbe mpya.
+                    </div>
+                </div>
+
+                <button type="button" class="notif-toggle-btn" onclick="toggleNotificationExpand()"
+                    aria-label="Toggle notification">
+                    <i class="fa-solid fa-chevron-down" id="notif-arrow"></i>
+                </button>
+
+            </div>
+
+            <div class="notif-expanded-content" id="notif-expanded">
+
+                <div class="notif-copy-box">
+                    <i class="fa-regular fa-copy"></i>
+                    <span id="notif-ref-id"></span>
+                </div>
+
+                <button type="button" class="notif-action-btn" onclick="dismissNotification()">
+                    Mark as read
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- MAIN -->
+        <div id="main-dashboard-content">
+
+            <div class="gochatz-header">
+
+                <div class="logo-group">
+
+                    <div class="logo-circle">
+                        go
+                    </div>
+
+                    <div class="logo-text">
+                        <h1>CHATIVO.ONLINE</h1>
+                        <p>Connect • Chat • Belong</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- NAV -->
+            <div class="top-nav-buttons">
+
+                <button type="button" class="btn-nav-action">
+                    <i class="fa-solid fa-download"></i>
+                    Install App
+                </button>
+
+                <a href="sms:0760639911" target="_blank" rel="noopener noreferrer" class="btn-nav-secondary">
+                    <i class="fa-solid fa-envelope"></i>
+                    SMS Msaada
+                </a>
+
+                <a href="https://whatsapp.com/channel/0029Vb9X9Z8DDmFMjUY4Yy1M" target="_blank"
+                    rel="noopener noreferrer" class="btn-nav-green">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    WhatsApp Channel
+                </a>
+
+            </div>
+
+            <!-- CLOCK -->
+            <div class="pill-card">
+
+                <i class="fa-regular fa-clock"></i>
+
+                <span id="live-time-str">
+                    --:--:--
+                </span>
+
+            </div>
+
+            <!-- ONLINE -->
+            <div class="pill-card">
+
+                <span class="status-dot"></span>
+
+                <span>
+                    <b>Wazungu 3,490</b> wapo mtandaoni
+                </span>
+
+            </div>
+
+            <!-- BALANCE -->
+            <div class="fin-cards-grid">
+
+                <div class="fin-card balance">
+
+                    <div class="fin-card-title">
+                        👛 BALANCE
+                    </div>
+
+                    <div class="fin-card-value">
+                        TZS
+                        <span id="user-balance-text">50,000</span>
+                    </div>
+
+                    <button type="button" class="btn-toa-pesa" onclick="openWithdrawModal()">
+                        Toa Pesa
+                    </button>
+
+                </div>
+
+                <div class="fin-card withdraw">
+
+                    <div class="fin-card-title">
+                        🏦 WITHDRAW
+                    </div>
+
+                    <div class="fin-card-value">
+                        TZS
+                        <span id="user-withdraw-text">20,000</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PROMO -->
+            <div class="promo-banner">
+
+                <h2>
+                    Anza kuchuma leo na CHATIVO.ONLINE
+                </h2>
+
+                <a href="https://moxeraagencies.com/register?ref=Kendrich" target="_blank" class="btn-jisajili">
+                    Jisajili Sasa
+                </a>
+
+                <p class="promo-desc">
+                    Chagua rafiki au mtalii, kisha chagua muda na kupokea malipo yako.
+                </p>
+
+            </div>
+
+            <!-- PROFILES -->
+            <div class="section-header-row">
+
+                <div class="section-heading" id="guests-count-heading">
+                    Warafiki &amp; Watalii waliopo
+                </div>
+
+            </div>
+
+            <div class="guest-list" id="mzungu-grid"></div>
+
+            <!-- TRANSACTIONS -->
+            <div class="card-box">
+
+                <div class="card-section-title">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    HISTORIA YA MIAMALA
+                </div>
+
+                <div id="transaction-list"></div>
+
+            </div>
+
+            <div class="footer-reset-container">
+
+                <button type="button" class="btn-hidden-reset" onclick="restoreCodeData()">
+
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    Reset System Data
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- CHAT -->
+        <div id="chat-screen">
+
+            <div class="chat-header">
+
+                <button type="button" class="btn-chat-back" onclick="confirmExitChat()" aria-label="Rudi">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+
+                <div class="chat-user-info">
+
+                    <img id="chat-user-img" class="chat-avatar"
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Avatar">
+
+                    <div>
+
+                        <div id="chat-user-name">
+                            User
+                        </div>
+
+                        <div id="chat-status-text">
+                            Online sasa
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="chat-stats-right">
+
+                    <div id="timer">
+                        03:10
+                    </div>
+
+                    <div id="money">
+                        + TSh 0
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div id="chat-messages" class="chat-body">
+
+                <div id="typing-indicator" class="typing-indicator">
+
+                    <span>Anaandika</span>
+
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="chat-input-area">
+
+                <input id="message-input" type="text" placeholder="Andika ujumbe..." onkeydown="handleEnter(event)">
+
+                <button type="button" class="btn-send-green" onclick="sendMessage()">
+                    Tuma
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- WITHDRAW MODAL -->
+        <div class="modal-overlay" id="withdraw-modal">
+
+            <div class="modal-content">
+
+                <div class="modal-header-row">
+
+                    <span class="modal-title-green">
+                        KUTOA FEDHA
+                    </span>
+
+                    <button type="button" class="btn-modal-close" onclick="closeWithdrawModal()" aria-label="Funga">
+                        ✕
+                    </button>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Njia ya Kupokea</label>
+
+                    <select id="withdraw-method">
+                        <option>HaloPesa</option>
+                        <option>M-Pesa</option>
+                        <option>Tigo Pesa</option>
+                        <option>Airtel Money</option>
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Namba ya Simu</label>
+
+                    <input type="text" id="withdraw-account" placeholder="07XXXXXXXX">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Kiasi (TSh)</label>
+
+                    <input type="number" id="withdraw-amount" placeholder="Ingiza Kiasi">
+
+                </div>
+
+                <button type="button" class="btn-action-chat btn-withdraw-submit" onclick="processWithdrawal()">
+                    THIBITISHA KUTOA
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- RECEIPT MODAL -->
+        <div class="modal-overlay" id="receipt-modal">
+            <div class="modal-content">
+                <div class="receipt-header">
+                    <i class="fa-solid fa-circle-check receipt-icon-success"></i>
+                    <h3 class="receipt-title">MUAMALA UMEFANIKIWA</h3>
+                    <p class="receipt-subtitle">Risiti ya Kutoa Pesa CHATIVO</p>
+                </div>
+
+                <div class="receipt-box">
+                    <div class="receipt-row">
+                        <span> Kumbukumbu:</span>
+                        <b id="rec-ref">---</b>
+                    </div>
+                    <div class="receipt-row">
+                        <span> Mtandao:</span>
+                        <span id="rec-method">---</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span> Namba Simu:</span>
+                        <span id="rec-account">---</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span> Kiasi Utakachopokea:</span>
+                        <b id="rec-amount">--- TZS</b>
+                    </div>
+                    <div class="receipt-row">
+                        <span> Hali:</span>
+                        <span class="receipt-status-confirmed">Imethibitishwa</span>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-action-chat receipt-close-btn" onclick="closeReceiptModal()">
+                    FUNGA RISITI
+                </button>
+            </div>
+        </div>
+
+        <!-- CONGRATS MODAL -->
+        <div class="modal-overlay" id="congrats-modal">
+            <div class="modal-content modal-content-center">
+                <i class="fa-solid fa-trophy congrats-trophy-icon"></i>
+                <h2 class="congrats-title">HONGERA SANA! 🎉</h2>
+                <p id="congrats-text">
+                    Umekamilisha somo na mazungumzo kikamilifu!
+                </p>
+
+                <div class="congrats-reward-box">
+                    <span class="congrats-reward-label">PESA ILIYOINGIZWA ON SCREEN:</span><br>
+                    <b id="congrats-amount">+ TZS 0</b>
+                </div>
+
+                <button type="button" class="btn-action-chat" onclick="closeCongratsModal()">
+                    POKEA ZAWADI NA ENDELEA
+                </button>
+            </div>
+        </div>
+
+        <!-- EXIT MODAL -->
+        <div class="modal-overlay" id="exit-modal">
+
+            <div class="modal-content modal-content-center">
+
+                <p class="exit-modal-desc">
+                    Una uhakika unataka kutoka kwenye chat?
+                </p>
+
+                <div class="modal-btn-row">
+
+                    <button type="button" class="btn-action-chat btn-exit-cancel" onclick="closeExitModal()">
+                        Hapana
+                    </button>
+
+                    <button type="button" class="btn-action-chat btn-exit-confirm" onclick="exitChat()">
+                        Ndio
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        /* =========================================================
+           SETTINGS
+        ========================================================= */
+
+        const TOTAL_CHAT_SECONDS = 190;
+
+        /* =========================================================
+           PROFILES (20 PROFILES WITH VARIED TOPICS)
+        ========================================================= */
+
+        const allProfilesPool = [
+            {
+                id: "p_noah33",
+                name: "Noah",
+                age: 33,
+                country: "Uholanzi",
+                flag: "🇳🇱",
+                tags: ["Mrafiki", "Teknolojia"],
+                topic: "Kujadili Maisha na Mtandao wa Intaneti",
+                price: 30000,
+                duration: "Dakika 1",
+                img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Hujambo rafiki! Mimi kujifunza Kiswahili kidogo. Wewe fundisha mimi?",
+                    "Asante! Mimi Noah kutoka Uholanzi. Jina yako nani?",
+                    "Mimi penda sana maisha ya hapa. Intaneti huko kwenu iko mzuri?",
+                    "Mimi hamna jua sana kusema Kiswahili... Mimi sema 'Habari' iko sawa?",
+                    "Haha asante kwa kunirekebisha! Vipi vijana huko tumia intaneti sana?",
+                    "Aha, mimi elewa sasa. Watu penda mtandao gani zaidi?",
+                    "Mimi pia penda picha na video. Wewe fundisha mimi neno mpya!",
+                    "Neno hiyo maana yake nini? Mimi bado mgeni kidogo.",
+                    "Wah, Kiswahili ni lugha tamu sana kujifunza!",
+                    "Asante sana rafiki kwa kunifundisha leo, mimi furahi sana!"
+                ]
+            },
+            {
+                id: "p_julia28",
+                name: "Julia",
+                age: 28,
+                country: "Poland",
+                flag: "🇵🇱",
+                tags: ["Mtalii", "Utalii"],
+                topic: "Maeneo Mazuri ya Kutembelea na Bahari",
+                price: 50000,
+                duration: "Saa moja",
+                img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Jambo! Mimi Julia. Kiswahili yangu kidogo sana, wewe kusaidia?",
+                    "Mimi taka kuja tembea kwenu. Wapi mahali mzuri sana?",
+                    "Bahari au mbuga? Mimi kupenda mahali tulivu sana.",
+                    "Mimi sema 'Nataka kwenda' iko sahihi au mimi makosa?",
+                    "Ahaa, asante kwa kunifundisha kusema vizuri!",
+                    "Usafiri gani mimi tumia? Basi au Ndege?",
+                    "Mimi hofu kidogo kupotea, watu wa huko ni wakarimu?",
+                    "Ooh vizuri sana! Mimi furahi kusikia hivyo.",
+                    "Ungependa mimi kuja na nini kutoka kwetu Poland?",
+                    "Asante rafiki yangu kwa ushauri mzuri sana leo!"
+                ]
+            },
+            {
+                id: "p_lucas25",
+                name: "Lucas",
+                age: 25,
+                country: "Ujerumani",
+                flag: "🇩🇪",
+                tags: ["Mrafiki", "Filamu"],
+                topic: "Kujadili Filamu na Bongo Movie",
+                price: 35000,
+                duration: "Dakika 20",
+                img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Hallo rafiki! Mimi Lucas. Mimi penda sana kuangalia cinema!",
+                    "Mimi kujifunza maneno ya Kiswahili ya filamu.",
+                    "Je, 'Movie' inaitwaje kwa Kiswahili mtaani?",
+                    "'Filamu'! Ahh neno rahisi sana kukumbuka.",
+                    "Unapenda kuangalia filamu za aina gani? Action au Comedy?",
+                    "Haha nami pia penda sana vichekesho!",
+                    "Mimi jaribu kuangalia filamu yenye Kiswahili leo.",
+                    "Ni waigizaji gani mashuhuri sana huko kwenu?",
+                    "Nitaandika majina yao nitafute kwenye YouTube.",
+                    "Asante sana Lucas amefurahi kuchat nawe leo!"
+                ]
+            },
+            {
+                id: "p_sophia24",
+                name: "Sophia",
+                age: 24,
+                country: "Italia",
+                flag: "🇮🇹",
+                tags: ["Mtalii", "Lugha"],
+                topic: "Salamu za Heshima na Utamaduni",
+                price: 45000,
+                duration: "Dakika 15",
+                img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Ciao! Mimi Sophia kutoka Italia. Nataka kujifunza Kiswahili!",
+                    "Mimi nataka kujua jinsi ya kusalimia wazee kwa heshima.",
+                    "Je, 'Shikamoo' ndio neno sahihi kutumia?",
+                    "Ahaa! Na wazee wanajibu 'Marahaba', si ndio?",
+                    "Lugha yenu ina heshima kubwa sana, mimi penda mno.",
+                    "Je, nikitaka kusema 'Habari za asubuhi' inasemwaje?",
+                    "Asante sana kwa kunielekeza kwa uvumilivu.",
+                    "Mimi nitarudia kusema maneno haya kila siku.",
+                    "Italia na Afrika Mashariki ziko tofauti lakini watu ni wema.",
+                    "Grazie sana mwalimu wangu, siku njema!"
+                ]
+            },
+            {
+                id: "p_liam30",
+                name: "Liam",
+                age: 30,
+                country: "Canada",
+                flag: "🇨🇦",
+                tags: ["Mrafiki", "Biashara"],
+                topic: "Fursa za Biashara na Kilimo",
+                price: 60000,
+                duration: "Dakika 45",
+                img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Hello! Mimi Liam. Mimi kufanya biashara na kujifunza Kiswahili.",
+                    "Mimi nataka kujua zaidi kuhusu mazao ya kilimo kwenu.",
+                    "Je, 'Farmer' kwa Kiswahili anaitwaje?",
+                    "'Mkulima'! Jina zuri sana.",
+                    "Mazao gani yanalimwa kwa wingi huko kwenu?",
+                    "Kahawa na Chai? Hiyo ni biashara kubwa sana duniani.",
+                    "Mimi natamani siku moja kuwekeza kwenye kilimo huko.",
+                    "Je, watu huko wanapenda ushirikiano wa kibiashara?",
+                    "Asante kwa kunipa picha nzuri ya maisha ya biashara.",
+                    "Umekuwa rafiki na mwalimu bora sana leo, asante!"
+                ]
+            },
+            {
+                id: "p_simon29",
+                name: "Simon",
+                age: 29,
+                country: "Slovakia",
+                flag: "🇸🇰",
+                tags: ["Mtalii", "Mtaani"],
+                topic: "Kiswahili cha Mtaani na Slang",
+                price: 30000,
+                duration: "Dakika 1",
+                img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Sasa rafiki! Mimi Simon. Mimi tumia neno 'Sasa' sahihi?",
+                    "Mimi nataka kujifunza Kiswahili cha mtaani kabisa!",
+                    "Mimi kusema 'Mambo vipi', mtu jibu nini mtaani?",
+                    "Ahaa 'Poa'! Haha mimi penda neno hilo sana.",
+                    "Je, neno gani ingine ya kusalimia marafiki?",
+                    "Niaje? Haha hiyo ni nzuri sana rafiki!",
+                    "Wazungu wengi hawajui maneno haya, mimi bahati kupata wewe.",
+                    "Kama mimi nataka maji, mimi sema 'Nipe maji'?",
+                    "Asante kwa kunirekebisha kusema kwa heshima.",
+                    "Wewe ni mwalimu bora sana, asante sana!"
+                ]
+            },
+            {
+                id: "p_charlotte31",
+                name: "Charlotte",
+                age: 31,
+                country: "Ufaransa",
+                flag: "🇫🇷",
+                tags: ["Mtalii", "Chakula"],
+                topic: "Mapishi na Vyakula vya Asili",
+                price: 40000,
+                duration: "Dakika 25",
+                img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Bonjour! Mimi Charlotte. Mimi penda chakula sana!",
+                    "Mimi kujifunza Kiswahili kusema vyakula mbalimbali.",
+                    "Chakula gani tamu zaidi huko kwenu?",
+                    "Wali na Samaki? Mimi penda samaki sana!",
+                    "Je, neno 'Delicious' inasemwaje kwa Kiswahili?",
+                    "'Kitamu'! Haha chakula kitamu sana!",
+                    "Mimi nataka kujifunza kupika vyakula vya kwenu.",
+                    "Kiungo gani kinawekwa kwenye chakula kuwa kitamu?",
+                    "Mimi nitaandika recipe hii kwenye daftari langu.",
+                    "Asante sana mwalimu kwa mafunzo matamu!"
+                ]
+            },
+            {
+                id: "p_emma22",
+                name: "Emma",
+                age: 22,
+                country: "Uingereza",
+                flag: "🇬🇧",
+                tags: ["Mrafiki", "Muziki"],
+                topic: "Muziki wa Bongo Flava na Afrobeat",
+                price: 32000,
+                duration: "Dakika 10",
+                img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Hi! Mimi Emma. Nataka kujua muziki wa kwenu!",
+                    "Je, 'Music' kwa Kiswahili inaitwaje?",
+                    "'Muziki'! Ooh rahisi sana kutamka.",
+                    "Mimi nasikia watu wanaongelea 'Bongo Flava', ni nini?",
+                    "Ahaa, ni aina ya muziki wa vijana! Pamoja sana.",
+                    "Ni msanii gani anaimba vizuri sana huko?",
+                    "Nitatafuta nyimbo zake kwenye Spotify hivi karibuni.",
+                    "Je, unajua kucheza ngoma za asili pia?",
+                    "Kiswahili kina sauti nzuri sana kwenye nyimbo.",
+                    "Asante sana rafiki kwa kunielekeza muziki mzuri!"
+                ]
+            },
+            {
+                id: "p_sven35",
+                name: "Sven",
+                age: 35,
+                country: "Sweden",
+                flag: "🇸🇪",
+                tags: ["Mtalii", "Mazingira"],
+                topic: "Hali ya Hewa na Mimea ya Kitropiki",
+                price: 42000,
+                duration: "Dakika 30",
+                img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Hej! Mimi Sven kutoka Sweden. Huko joto sana?",
+                    "Hapa Sweden kuna baridi kali sana hivi sasa.",
+                    "Je, 'Weather' kwa Kiswahili inaitwaje?",
+                    "'Hali ya hewa'! Sawa kabisa, nimeelewa.",
+                    "Mimi penda sana miti ya nazi na matunda ya kitropiki.",
+                    "Matunda gani yanapatikana kwa wingi msimu huu?",
+                    "Embe na Maembe? Matunda matamu sana!",
+                    "Mimi nataka kuja kupumzika kwenye fukwe za joto.",
+                    "Usafiri kutoka Ulaya hadi huko unachukua muda gani?",
+                    "Tutaonana hivi karibuni! Asante kwa maongezi mazuri."
+                ]
+            },
+            {
+                id: "p_mateo27",
+                name: "Mateo",
+                age: 27,
+                country: "Uhispania",
+                flag: "🇪🇸",
+                tags: ["Mrafiki", "Michezo"],
+                topic: "Mpira wa Miguu na Ligi za Mtaani",
+                price: 38000,
+                duration: "Dakika 15",
+                img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Hola! Mimi Mateo. Mimi napenda sana mpira!",
+                    "Je, watu wa huko wanapenda mpira wa miguu?",
+                    "Timu gani za mtaani zina mashabiki wengi?",
+                    "Simba na Yanga? Ooh derby kubwa sana hiyo!",
+                    "Mimi napenda Real Madrid, wewe unapenda timu gani?",
+                    "Je, 'Goal' inaitwaje kwa Kiswahili?",
+                    "'Goli'! Hahaha hiyo ni neno rahisi sana.",
+                    "Mimi nataka kuja kucheza mpira kwenye fukwe za mchanga.",
+                    "Watu huko wanacheza mpira jioni?",
+                    "Muchas gracias rafiki! Imekuwa chat nzuri sana."
+                ]
+            },
+            {
+                id: "p_hannah26",
+                name: "Hannah",
+                age: 26,
+                country: "Norway",
+                flag: "🇳🇴",
+                tags: ["Mtalii", "Lugha"],
+                topic: "Kujifunza Hesabu na Namba za Kiswahili",
+                price: 36000,
+                duration: "Dakika 20",
+                img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Hei! Mimi Hannah. Nataka kujifunza kuhesabu namba.",
+                    "Je, 1 hadi 5 inasemwaje kwa Kiswahili?",
+                    "Moja, mbili, tatu, nne, tano! Je, ni sahihi?",
+                    "Ahaa asante! Na 10 inasemwaje?",
+                    "'Kumi'! Nimeelewa vizuri sana.",
+                    "Je, nikienda sokoni nitatumia namba hizi kununua vitu?",
+                    "Ni muhimu kujua namba ili nisidhulumiwe sokoni.",
+                    "Ungependa kunifundisha namba 20 na 30 pia?",
+                    "Kiswahili ni rahisi kuhesabu kuliko lugha zingine.",
+                    "Takk skal du ha! Asante sana mwalimu wangu."
+                ]
+            },
+            {
+                id: "p_oliver29",
+                name: "Oliver",
+                age: 29,
+                country: "Denmark",
+                flag: "🇩🇰",
+                tags: ["Mrafiki", "Sanaa"],
+                topic: "Sanaa ya Tingatinga na Vinyago",
+                price: 48000,
+                duration: "Dakika 40",
+                img: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Hej! Mimi Oliver. Mimi ni msanii wa picha.",
+                    "Mimi napenda sana michoro ya rangi za asili.",
+                    "Je, mchoro wa Tingatinga unapikwa au unachorwa?",
+                    "Unachorwa kwa mikono! Visual arts za ajabu sana.",
+                    "Vinyago vya mbao vina maana gani katika utamaduni wenu?",
+                    "Mimi nataka kununua kinyago cha kiumbe cha asili.",
+                    "Wachoraji wanapatikana maeneo gani zaidi?",
+                    "Nitafurahi kutembelea masoko ya sanaa nikiwepo.",
+                    "Sanaa yenu inaonyesha maisha halisi ya Afrika.",
+                    "Asante sana kwa maelezo mazuri na ya kina!"
+                ]
+            },
+            {
+                id: "p_isabella23",
+                name: "Isabella",
+                age: 23,
+                country: "Ureno",
+                flag: "🇵🇹",
+                tags: ["Mtalii", "Mavazi"],
+                topic: "Mavazi ya Asili kama Kanga na Kitenge",
+                price: 34000,
+                duration: "Dakika 12",
+                img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Olá! Mimi Isabella. Nataka kujua kuhusu mavazi ya kwenu.",
+                    "Mimi naona wanawake wanavaa vitambaa vya rangi nzuri.",
+                    "Vinaitwaje vitambaa hivyo vyenye maandishi?",
+                    "'Kanga'! Ahaa, na vile vingine vizito vinaitwaje?",
+                    "'Kitenge'! Picha zake ni nzuri mno.",
+                    "Maandishi yaliyoandikwa kwenye Kanga yana maana gani?",
+                    "Yana ujumbe wa maisha au methali? Hiyo ni ya kuvutia sana!",
+                    "Mimi nataka kununua Kanga zenye ujumbe wa upendo.",
+                    "Je, wanaume pia wanavaa vitenge?",
+                    "Obrigada! Asante kwa kunifundisha utamaduni huu."
+                ]
+            },
+            {
+                id: "p_arthur34",
+                name: "Arthur",
+                age: 34,
+                country: "Uswisi",
+                flag: "🇨🇭",
+                tags: ["Mrafiki", "Wanyama"],
+                topic: "Wanyama wa Mbugani na Safari",
+                price: 55000,
+                duration: "Saa moja",
+                img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Grüezi! Mimi Arthur. Nataka kufanya Safari ya wanyama.",
+                    "Je, 'Lion' kwa Kiswahili anaitwaje?",
+                    "'Simba'! Kama mfalme wa mwitu!",
+                    "Na 'Elephant' anaitwaje kwa lugha yenu?",
+                    "'Tembo'! Neno zito na zuri sana.",
+                    "Ni mbuga gani ina wanyama wengi zaidi kutembelea?",
+                    "Serengeti au Ngorongoro? Zote zinaonekana nzuri.",
+                    "Mimi natamani kuona msafara wa nyumbu pia.",
+                    "Je, ni salama kupiga picha ukiwa karibu nao?",
+                    "Asante sana Arthur amefurahi kupata taarifa hizi!"
+                ]
+            },
+            {
+                id: "p_elena27",
+                name: "Elena",
+                age: 27,
+                country: "Ugiriki",
+                flag: "🇬🇷",
+                tags: ["Mtalii", "Historia"],
+                topic: "Mijini ya Kale na Historia ya Pwani",
+                price: 41000,
+                duration: "Dakika 35",
+                img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Yassas! Mimi Elena. Mimi napenda sana historia ya kale.",
+                    "Mji wa kale wa Pwani unaitwaje?",
+                    "Zanzibar na Kilwa? Majina yenye historia ndefu.",
+                    "Je, majengo ya zamani yamejengwa kwa mawe gani?",
+                    "Mawe ya matumbawe! Hiyo ni historia ya ajabu sana.",
+                    "Kiswahili kilianza kutumika zamani sana pwani?",
+                    "Mimi napenda kujua mchanganyiko wa utamaduni wa Kiarabu na Kiasili.",
+                    "Je, kuna makumbusho ya kuangalia vitu vya kale?",
+                    "Nitahakikisha natembelea maeneo hayo nikiingia nchini.",
+                    "Efcharisto! Asante sana kwa elimu hii ya historia."
+                ]
+            },
+            {
+                id: "p_viktor32",
+                name: "Viktor",
+                age: 32,
+                country: "Austria",
+                flag: "🇦🇹",
+                tags: ["Mrafiki", "Milima"],
+                topic: "Kupanda Mlima Kilimanjaro",
+                price: 52000,
+                duration: "Dakika 50",
+                img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Hallo! Mimi Viktor. Mimi ni mpanda milima.",
+                    "Mlima mrefu zaidi Afrika unaitwa Kilimanjaro, si ndio?",
+                    "Je, inachukua siku ngapi kufika kileleni?",
+                    "Siku 6 hadi 7! Changamoto kubwa na nzuri.",
+                    "Je, baridi ni kali sana ukiwa kileleni?",
+                    "Kuna barafu juu ya mlima wa kitropiki? Hiyo ni ajabu!",
+                    "Wapandisha milima wanaitwaje kwa Kiswahili?",
+                    "Mimi nataka kujiandaa vizuri kimwili kabla ya kuja.",
+                    "Je, watu wa mtaani wana maneno ya kutia moyo wapandaji?",
+                    "'Hakuna Matata' na 'Pole pole'! Asante sana rafiki!"
+                ]
+            },
+            {
+                id: "p_chloe21",
+                name: "Chloe",
+                age: 21,
+                country: "Ubelgiji",
+                flag: "🇧🇪",
+                tags: ["Mtalii", "Vinywaji"],
+                topic: "Kahawa, Chai na Vinywaji vya Asili",
+                price: 28000,
+                duration: "Dakika 10",
+                img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Salut! Mimi Chloe. Mimi napenda kunywa chai jioni.",
+                    "Je, watu huko wanapenda kunywa chai au kahawa?",
+                    "Chai ya maziwa yenye viungo! Inaitwaje hiyo chai?",
+                    "'Chai ya Maziwa' au 'Chai ya Tangawizi'!",
+                    "Mimi napenda sana harufu ya tangawizi na mdalasini.",
+                    "Je, kahawa inalimwa maeneo gani zaidi?",
+                    "Mimi nataka kujifunza kusema 'Nipe chai tafadhali'.",
+                    "Ahaa, 'Nipe chai tafadhali', neno zuri na la heshima.",
+                    "Vyakula gani vinaliwa pamoja na chai asubuhi?",
+                    "Merci beaucoup! Asante sana rafiki yangu."
+                ]
+            },
+            {
+                id: "p_felipe30",
+                name: "Felipe",
+                age: 30,
+                country: "Brazil",
+                flag: "🇧🇷",
+                tags: ["Mrafiki", "Ngoma"],
+                topic: "Ngoma za Asili na Sherehe za Kitamaduni",
+                price: 39000,
+                duration: "Dakika 20",
+                img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Olá! Mimi Felipe kutoka Brazil. Mimi napenda kucheza ngoma!",
+                    "Brazil tuna Samba, je huko mna ngoma gani za asili?",
+                    "Ngoma za mdumange na kioda? Majina ya kuvutia sana!",
+                    "Je, ngoma zinapigwa kwenye sherehe za harusi?",
+                    "Sherehe za harusi huko zina furaha kubwa na muziki.",
+                    "Je, 'Dance' kwa Kiswahili inaitwaje?",
+                    "'Kucheza' au 'Kucheza ngoma'! Sawa kabisa.",
+                    "Mimi nataka kujifunza midundo ya ngoma za Afrika.",
+                    "Watu huko wana ukarimu sana kwenye sherehe.",
+                    "Muito obrigado! Asante sana kwa maongezi mazuri."
+                ]
+            },
+            {
+                id: "p_klara25",
+                name: "Klara",
+                age: 25,
+                country: "Czechia",
+                flag: "🇨🇿",
+                tags: ["Mtalii", "Usafiri"],
+                topic: "Usafiri wa Bodaboda na Bajaj Mjini",
+                price: 31000,
+                duration: "Dakika 15",
+                img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Ahoj! Mimi Klara. Nataka kujua usafiri wa mjini.",
+                    "Mimi naona picha za pikipiki na vyombo vya miguu mitatu.",
+                    "Vyombo hivyo vinaitwaje mtaani?",
+                    "'Bodaboda' na 'Bajaj'! Majina ya kufurahisha sana.",
+                    "Je, ni rahisi kupata Bodaboda ukiwa barabarani?",
+                    "Ni usafiri wa haraka sana kupita kwenye foleni.",
+                    "Je, nikipanda natakiwa kuvaa kofia ngumu (helmet)?",
+                    "Usalama ni muhimu sana! Nitahakikisha naangalia hilo.",
+                    "Je, 'How much' inasemwaje kwa Kiswahili kunadi nauli?",
+                    "'Kiasi gani?' Ahaa, asante sana mwalimu!"
+                ]
+            },
+            {
+                id: "p_leo28",
+                name: "Leo",
+                age: 28,
+                country: "Finland",
+                flag: "🇫🇮",
+                tags: ["Mrafiki", "Familia"],
+                topic: "Urafiki, Familia na Maisha ya Kila Siku",
+                price: 37000,
+                duration: "Dakika 25",
+                img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80",
+                dialog: [
+                    "Moi! Mimi Leo kutoka Finland. Huko maisha yako vipi?",
+                    "Mimi nataka kujua jinsi ya kusema maneno ya familia.",
+                    "Je, 'Brother' na 'Sister' wanaitwaje kwa Kiswahili?",
+                    "'Kaka' na 'Dada'! Majina mafupi na matamu.",
+                    "Na 'Mother' na 'Father' wanaitwaje?",
+                    "'Mama' na 'Baba'! Hiyo ni sawa na lugha nyingi duniani.",
+                    "Watu wa kwenu wana thamani kubwa kwa familia zao.",
+                    "Mimi napenda sana utamaduni wa kusaidiana kijamii.",
+                    "Kiswahili ni lugha inayounganisha watu wengi sana.",
+                    "Kiitos! Asante sana rafiki kwa kuchat na mimi leo."
+                ]
+            }
+        ];
+
+        /* =========================================================
+           STORAGE & DAILY WITHDRAW CALCULATIONS
+        ========================================================= */
+
+        let userBalance = parseFloat(localStorage.getItem("gochatz_balance")) || 0;
+        let haloPesaBalance = parseFloat(localStorage.getItem("gochatz_halopesa_bal")) || 0;
+        let completedProfiles = JSON.parse(localStorage.getItem("gochatz_completed")) || [];
+
+        // Calculate Daily Withdraw dynamically starting from 20,000 TZS
+        function getDailyWithdrawAmount() {
+            const today = new Date();
+            const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+            // Dynamically varies above 20,000 base threshold
+            const baseDynamic = 20000 + (dateSeed % 50000);
+            const addedUserWithdraw = parseFloat(localStorage.getItem("gochatz_today_withdraw_added")) || 0;
+            return baseDynamic + addedUserWithdraw;
+        }
+
+        let transactions = (JSON.parse(localStorage.getItem("gochatz_txs")) || []).map(t => ({ ...t, title: (t.title || "").replace(/GOCHATZ/gi, "CHATIVO") }));
+        if (transactions.length === 0) transactions = [
+            {
+                title: "Kutoka CHATIVO (HaloPesa)",
+                amount: 25000,
+                time: "Jana",
+                isIncome: false
+            },
+            {
+                title: "Kutoka CHATIVO (M-Pesa)",
+                amount: 40000,
+                time: "Siku 3 zilizopita",
+                isIncome: false
+            }
+        ];
+
+        /* =========================================================
+           DISPLAY
+        ========================================================= */
+
+        function updateBalanceDisplay() {
+            document.getElementById("user-balance-text").innerText = userBalance.toLocaleString();
+            document.getElementById("user-withdraw-text").innerText = getDailyWithdrawAmount().toLocaleString();
+        }
+
+        function renderTransactions() {
+            const list = document.getElementById("transaction-list");
+            list.innerHTML = "";
+
+            if (transactions.length === 0) {
+                list.innerHTML = `
+        <p style="font-size:10px;color:#64748b;text-align:center;padding:8px">
+            Hakuna miamala iliyofanyika
+        </p>`;
+                return;
+            }
+
+            transactions.slice().reverse().forEach(tx => {
+                const cls = tx.isIncome ? "tx-green" : "tx-red";
+                const sign = tx.isIncome ? "+" : "-";
+
+                list.innerHTML += `
+        <div class="tx-item">
+            <div>
+                <div class="tx-name">${tx.title}</div>
+                <div class="tx-time">${tx.time}</div>
+            </div>
+            <div class="${cls}">
+                ${sign} TSh ${tx.amount.toLocaleString()}
+            </div>
+        </div>`;
+            });
+        }
+
+        /* =========================================================
+           PROFILE CARDS
+        ========================================================= */
+
+        function renderCards() {
+            const grid = document.getElementById("mzungu-grid");
+            grid.innerHTML = "";
+
+            document.getElementById("guests-count-heading").innerText =
+                `Wageni waliopo (${allProfilesPool.length})`;
+
+            allProfilesPool.forEach(p => {
+                const isDone = completedProfiles.includes(p.id);
+                const tags = p.tags.map(t => `<span class="tag-pill">${t}</span>`).join("");
+
+                grid.innerHTML += `
+        <div class="guest-card">
+            <div class="guest-header">
+                <div class="guest-avatar-wrapper">
+                    <img src="${p.img}" class="guest-avatar">
+                    <span class="guest-flag-badge">${p.flag}</span>
+                </div>
+                <div>
+                    <div class="guest-info-name">${p.name} • ${p.age}</div>
+                    <div class="guest-status">
+                        <span class="status-dot"></span>
+                        Yupo tayari kuchat
+                    </div>
+                    <div class="guest-country">${p.flag} ${p.country}</div>
+                </div>
+            </div>
+            <div class="tags-row">${tags}</div>
+            <div class="guest-price-row">
+                <span class="pill-time">${p.duration}</span>
+                <span class="pill-price">TZS ${p.price.toLocaleString()}</span>
+            </div>
+            <div class="card-site-footer">
+                <i class="fa-solid fa-globe"></i> CHATIVO.ONLINE
+            </div>
+            <div class="action-buttons-grid">
+                ${isDone
+                        ? `<button class="btn-action-completed" disabled>Imekamilika</button>`
+                        : `<button class="btn-action-chat" onclick="startChat('${p.id}')">Anza Chat</button>`
+                    }
+            </div>
+        </div>`;
+            });
+        }
+
+        /* =========================================================
+           CHAT
+        ========================================================= */
+
+        let activeProfile = null;
+        let timerInterval = null;
+        let remainingSeconds = TOTAL_CHAT_SECONDS;
+        let currentMsgIdx = 0;
+
+        function startChat(id) {
+            activeProfile = allProfilesPool.find(p => p.id === id);
+
+            if (!activeProfile || completedProfiles.includes(activeProfile.id)) return;
+
+            document.getElementById("main-dashboard-content").style.display = "none";
+            document.getElementById("chat-screen").style.display = "flex";
+
+            document.getElementById("chat-user-name").innerText = `${activeProfile.name} ${activeProfile.flag}`;
+            document.getElementById("chat-user-img").src = activeProfile.img;
+            document.getElementById("chat-status-text").innerText = "Online sasa";
+
+            const box = document.getElementById("chat-messages");
+            const typing = document.getElementById("typing-indicator");
+
+            box.innerHTML = `
+    <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px 14px;border-radius:12px;font-size:12px;text-align:center;margin-bottom:12px">
+        Mada: ${activeProfile.topic}<br>
+        Zawadi: <b>TSh ${activeProfile.price.toLocaleString()}</b><br>
+        <span style="font-size:10px">CHATIVO.ONLINE Verified</span>
+    </div>`;
+
+            box.appendChild(typing);
+
+            remainingSeconds = TOTAL_CHAT_SECONDS;
+            currentMsgIdx = 0;
+
+            document.getElementById("money").innerText = "+ TSh 0";
+
+            clearInterval(timerInterval);
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay();
+
+                const elapsed = TOTAL_CHAT_SECONDS - remainingSeconds;
+                const earned = Math.floor((activeProfile.price / TOTAL_CHAT_SECONDS) * elapsed);
+
+                document.getElementById("money").innerText = `+ TSh ${earned.toLocaleString()}`;
+
+                if (remainingSeconds <= 0) {
+                    finishChat();
+                }
+            }, 1000);
+
+            triggerMzunguResponse(1000);
+        }
+
+        function updateTimerDisplay() {
+            const min = Math.floor(remainingSeconds / 60).toString().padStart(2, "0");
+            const sec = (remainingSeconds % 60).toString().padStart(2, "0");
+            document.getElementById("timer").innerText = `${min}:${sec}`;
+        }
+
+        /* =========================================================
+           AUTO CHAT RESPONSE
+        ========================================================= */
+
+        function triggerMzunguResponse(delay = 0) {
+            if (!activeProfile || currentMsgIdx >= activeProfile.dialog.length) return;
+
+            setTimeout(() => {
+                const typing = document.getElementById("typing-indicator");
+                typing.style.display = "flex";
+                document.getElementById("chat-status-text").innerText = "Anaandika...";
+
+                const box = document.getElementById("chat-messages");
+                box.scrollTop = box.scrollHeight;
+
+                setTimeout(() => {
+                    typing.style.display = "none";
+                    document.getElementById("chat-status-text").innerText = "Online sasa";
+
+                    const msg = document.createElement("div");
+                    msg.className = "msg-mzungu";
+                    msg.innerText = activeProfile.dialog[currentMsgIdx];
+
+                    box.insertBefore(msg, typing);
+                    box.scrollTop = box.scrollHeight;
+                    currentMsgIdx++;
+                }, 4500);
+            }, delay);
+        }
+
+        /* =========================================================
+           SEND MESSAGE
+        ========================================================= */
+
+        function sendMessage() {
+            const input = document.getElementById("message-input");
+            const text = input.value.trim();
+            if (!text) return;
+
+            const box = document.getElementById("chat-messages");
+            const msg = document.createElement("div");
+            msg.className = "msg-me";
+            msg.innerText = text;
+
+            box.insertBefore(msg, document.getElementById("typing-indicator"));
+            input.value = "";
+            box.scrollTop = box.scrollHeight;
+
+            triggerMzunguResponse(1500);
+        }
+
+        function handleEnter(e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        }
+
+        /* =========================================================
+           FINISH CHAT
+        ========================================================= */
+
+        function finishChat() {
+            clearInterval(timerInterval);
+
+            if (!activeProfile || completedProfiles.includes(activeProfile.id)) return;
+
+            completedProfiles.push(activeProfile.id);
+            userBalance += activeProfile.price;
+
+            transactions.push({
+                title: `Malipo ya Chat (${activeProfile.name})`,
+                amount: activeProfile.price,
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                isIncome: true
+            });
+
+            localStorage.setItem("gochatz_balance", userBalance);
+            localStorage.setItem("gochatz_completed", JSON.stringify(completedProfiles));
+            localStorage.setItem("gochatz_txs", JSON.stringify(transactions));
+
+            updateBalanceDisplay();
+            renderCards();
+            renderTransactions();
+
+            document.getElementById("chat-status-text").innerText = "Imekamilika";
+
+            document.getElementById("congrats-text").innerText = `Hongera! Umezungumza na kumfundisha ${activeProfile.name} Kiswahili kikamilifu!`;
+            document.getElementById("congrats-amount").innerText = `+ TZS ${activeProfile.price.toLocaleString()}`;
+            document.getElementById("congrats-modal").style.display = "flex";
+        }
+
+        function closeCongratsModal() {
+            document.getElementById("congrats-modal").style.display = "none";
+            exitChat();
+        }
+
+        /* =========================================================
+           EXIT CHAT
+        ========================================================= */
+
+        function confirmExitChat() {
+            document.getElementById("exit-modal").style.display = "flex";
+        }
+
+        function closeExitModal() {
+            document.getElementById("exit-modal").style.display = "none";
+        }
+
+        function exitChat() {
+            closeExitModal();
+            clearInterval(timerInterval);
+            document.getElementById("chat-screen").style.display = "none";
+            document.getElementById("main-dashboard-content").style.display = "block";
+        }
+
+        /* =========================================================
+           WITHDRAW & RECEIPT MODAL
+        ========================================================= */
+
+        function openWithdrawModal() {
+            document.getElementById("withdraw-modal").style.display = "flex";
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById("withdraw-modal").style.display = "none";
+        }
+
+        let pendingNotification = null;
+
+        function processWithdrawal() {
+            const method = document.getElementById("withdraw-method").value;
+            const account = document.getElementById("withdraw-account").value.trim();
+            const amount = parseFloat(document.getElementById("withdraw-amount").value);
+
+            if (!account || isNaN(amount) || amount <= 0) {
+                alert("Ingiza taarifa sahihi!");
+                return;
+            }
+
+            if (amount > userBalance) {
+                alert("Salio lako halitoshi!");
+                return;
+            }
+
+            userBalance -= amount;
+            haloPesaBalance += amount;
+
+            let currentAdded = parseFloat(localStorage.getItem("gochatz_today_withdraw_added")) || 0;
+            localStorage.setItem("gochatz_today_withdraw_added", currentAdded + amount);
+
+            const refId = Math.floor(1000000000000000 + Math.random() * 9000000000000000);
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+            transactions.push({
+                title: `Kutoka CHATIVO (${method})`,
+                amount: amount,
+                time: timeStr,
+                isIncome: false
+            });
+
+            localStorage.setItem("gochatz_balance", userBalance);
+            localStorage.setItem("gochatz_halopesa_bal", haloPesaBalance);
+            localStorage.setItem("gochatz_txs", JSON.stringify(transactions));
+
+            updateBalanceDisplay();
+            renderTransactions();
+            closeWithdrawModal();
+
+            document.getElementById("rec-ref").innerText = refId;
+            document.getElementById("rec-method").innerText = method;
+            document.getElementById("rec-account").innerText = account;
+            document.getElementById("rec-amount").innerText = amount.toLocaleString() + " TZS";
+
+            const previewMsg = `Tnx ${refId}. Umepokea ${amount.toLocaleString()} TZS kutoka CHATIVO kwenda ${account}. Salio lako jipya la ${method} ni TZS ${haloPesaBalance.toLocaleString()}.`;
+            pendingNotification = { method, timeStr, previewMsg, refId };
+
+            document.getElementById("receipt-modal").style.display = "flex";
+        }
+
+        function closeReceiptModal() {
+            document.getElementById("receipt-modal").style.display = "none";
+
+            if (pendingNotification) {
+                document.getElementById("notif-provider-title").innerText = pendingNotification.method;
+                document.getElementById("notif-time").innerText = pendingNotification.timeStr;
+                document.getElementById("notif-body-text").innerText = pendingNotification.previewMsg;
+                document.getElementById("notif-ref-id").innerText = pendingNotification.refId;
+                document.getElementById("notif-banner").classList.add("active");
+                pendingNotification = null;
+            }
+        }
+
+        /* =========================================================
+           NOTIFICATION
+        ========================================================= */
+
+        let isExpanded = false;
+
+        function toggleNotificationExpand() {
+            isExpanded = !isExpanded;
+            const expanded = document.getElementById("notif-expanded");
+            const arrow = document.getElementById("notif-arrow");
+
+            if (isExpanded) {
+                expanded.style.display = "block";
+                arrow.className = "fa-solid fa-chevron-up";
+            } else {
+                expanded.style.display = "none";
+                arrow.className = "fa-solid fa-chevron-down";
+            }
+        }
+
+        function dismissNotification() {
+            document.getElementById("notif-banner").classList.remove("active");
+        }
+
+        /* =========================================================
+           RESET SYSTEM DATA
+        ========================================================= */
+
+        function restoreCodeData() {
+            if (!confirm("Je, unataka kurudisha mifumo kwenye hali ya mwanzo?")) return;
+
+            userBalance = 0;
+            haloPesaBalance = 0;
+            completedProfiles = [];
+            localStorage.removeItem("gochatz_today_withdraw_added");
+
+            transactions = [
+                {
+                    title: "Kutoka CHATIVO (HaloPesa)",
+                    amount: 25000,
+                    time: "Jana",
+                    isIncome: false
+                },
+                {
+                    title: "Kutoka CHATIVO (M-Pesa)",
+                    amount: 40000,
+                    time: "Siku 3 zilizopita",
+                    isIncome: false
+                }
+            ];
+
+            localStorage.setItem("gochatz_balance", userBalance);
+            localStorage.setItem("gochatz_halopesa_bal", haloPesaBalance);
+            localStorage.setItem("gochatz_completed", JSON.stringify(completedProfiles));
+            localStorage.setItem("gochatz_txs", JSON.stringify(transactions));
+
+            updateBalanceDisplay();
+            renderTransactions();
+            renderCards();
+        }
+
+        /* =========================================================
+           CLOCK
+        ========================================================= */
+
+        function updateClock() {
+            const now = new Date();
+            const days = ["Jumapili", "Jumatatu", "Jumanne", "Jumatano", "Alhamisi", "Ijumaa", "Jumamosi"];
+            const months = ["Januari", "Februari", "Machi", "Aprili", "Mei", "Juni", "Julai", "Agosti", "Septemba", "Oktoba", "Novemba", "Disemba"];
+            const time = now.toTimeString().split(" ")[0];
+
+            document.getElementById("live-time-str").innerText =
+                `${time} • ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+        }
+
+        /* =========================================================
+           START
+        ========================================================= */
+
+        setInterval(updateClock, 1000);
+
+        window.onload = function () {
+            updateClock();
+            renderCards();
+            updateBalanceDisplay();
+            renderTransactions();
+        };
+
+    </script>
+
+</body>
+
+</html>
